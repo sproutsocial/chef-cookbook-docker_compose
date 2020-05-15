@@ -10,6 +10,7 @@ property :remove_orphans, kind_of: [TrueClass, FalseClass], default: false
 property :services, kind_of: Array, default: []
 
 default_action :up
+root_home_dir = Dir.home('root')
 
 def get_compose_params
   "-p #{project_name}" +
@@ -36,7 +37,7 @@ action :up do
 
   execute "running docker-compose up for project #{project_name}" do
     command "docker-compose #{get_compose_params} up #{get_up_params}"
-    environment('PATH' => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin')
+    environment('PATH' => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin', 'HOME' => root_home_dir)
     only_if "[ $(docker-compose -f #{compose_files.join(' -f ')} ps -q | wc -l) -eq 0 ]"
     user 'root'
     group 'root'
@@ -48,7 +49,7 @@ action :create do
 
   execute "running docker-compose create for project #{project_name}" do
     command "docker-compose #{get_compose_params} create #{get_up_params}"
-    environment('PATH' => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin')
+    environment('PATH' => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin', 'HOME' => root_home_dir)
     user 'root'
     group 'root'
   end
@@ -60,7 +61,7 @@ action :down do
 
   execute "running docker-compose down for project #{project_name}" do
     command "docker-compose #{get_compose_params} down  #{get_down_params}"
-    environment('PATH' => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin')
+    environment('PATH' => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin', 'HOME' => root_home_dir)
     not_if "[ $(docker-compose -f #{compose_files.join(' -f ')} ps -q | wc -l) -eq 0 ]"
     user 'root'
     group 'root'
